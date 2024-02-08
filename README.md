@@ -368,6 +368,9 @@ If you've reached this point, congratulations! As a stretch, you might like to d
 <details>
   <summary>How to submit this challenge</summary>
 
+This challenge can be used for the following assessments: 
+- WD01: Build an HTTP server with a restful JSON API
+  
 This challenge ships with some end-to-end tests written in playwright, if you are submitting this
 challenge to complete an NZQA requirement, please make sure these tests are passing _before_ you submit.
 
