@@ -349,6 +349,8 @@ Your tests still won't pass yet (That will happen after we bring in readFile in 
   ```
 
   When you've finished this, our route tests should pass. Load up the edit form: http://localhost:5173/1/edit and check that everything works as expected.
+
+Commit, push and you could now submit your branch for the CP07 Trello ticket :) 
   </details>
 
 ## Stretch
