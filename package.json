@@ -39,6 +39,7 @@
   "devDependencies": {
     "@devacademy/eslint-config": "^1.9.1",
     "@playwright/test": "^1.38.1",
+    "@tanstack/eslint-plugin-query": "^5.12.2",
     "@tanstack/react-query": "^5.12.2",
     "@tanstack/react-query-devtools": "^5.13.3",
     "@testing-library/dom": "^8.17.1",

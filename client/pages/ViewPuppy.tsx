@@ -13,7 +13,7 @@ export default function ViewPuppy() {
 
   const puppy = usePuppy(id)
 
-  if (puppy.isLoading) {
+  if (puppy.isPending) {
     return <LoadingIndicator />
   }
 

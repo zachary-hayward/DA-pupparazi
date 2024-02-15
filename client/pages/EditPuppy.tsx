@@ -26,7 +26,7 @@ export default function EditPuppy() {
     [edit, navigate, id]
   )
 
-  if (puppy.isLoading) {
+  if (puppy.isPending) {
     return <LoadingIndicator />
   }
 

@@ -7,7 +7,7 @@ import LoadingIndicator from '../components/LoadingIndicator.tsx'
 export default function PuppiesList() {
   const puppies = usePuppies()
 
-  if (puppies.isLoading) {
+  if (puppies.isPending) {
     return <LoadingIndicator />
   }
 
