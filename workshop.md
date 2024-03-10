@@ -115,7 +115,7 @@ And if you visit the browser now, you should be able to see our beautiful pups :
       Share your solutions and discuss any challenges faced.
 </details>
 
-### 2. Displaying the Detailed Puppy Page
+### 2. Displaying a detailed single puppy page
 
 - [ ] As a user, I want to click on a puppy and see their name, breed, and who their owner is.
 
@@ -194,7 +194,7 @@ For this step we will implement a route `GET /api/v1/puppies/:id` to fetch detai
       Share your solutions and discuss any challenges faced.
 </details>
 
-### 3. Updating a Puppy
+### 3. Updating a puppy
 
 - [ ] As a user, I want to be able to update the puppy's name, breed, and owner
 
@@ -368,7 +368,7 @@ Commit, push and you could now submit your branch for the CP07 Trello ticket :)
       Share your solutions and discuss any challenges faced.
 </details>
 
-## 4. Stretch: Add a new puppy
+## 4. Stretch: Adding a new puppy
 
 - [ ] As a user, I want to add a new puppy.
 
@@ -381,7 +381,7 @@ For this step you will add a new react component and client-side route that show
       Share your solutions and discuss any challenges faced.
 </details>
 
-## 5. Stretch: Add a new animal 
+## 5. Stretch: Adding a new animal 
 
 - [ ] As a user, I want to add a new animal.
 
