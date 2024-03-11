@@ -59,7 +59,7 @@ Now that you have an idea of what is going on, let's get our first route going, 
   Then we'll add our root ('/') puppy route handler. For now, we'll just send an empty array:
 
   ```js
-  router.get('/', async (req, res, next) => {
+  router.get('/', async (req, res) => {
     res.json([])
   })
   ```
@@ -97,7 +97,7 @@ Use the 'default' puppies from `server/initial-data.ts`
   ```ts
   import * as store from '../store.ts'
 
-  router.get('/', async (req, res, next) => {
+  router.get('/', async (req, res) => {
     const data = await store.getPuppies()
     res.json(data)
   })
@@ -171,7 +171,7 @@ For this step we will implement a route `GET /api/v1/puppies/:id` to fetch detai
   Next, add a new route handler in [`puppies.ts`](./server/routes/puppies.ts) which uses a route param:
 
   ```js
-  router.get('/:id', async (res, req, next) => {
+  router.get('/:id', async (res, req) => {
     const id = Number(req.params.id)
     console.log(id)
   })
@@ -321,13 +321,13 @@ For this step you will implement a route `PATCH /api/v1/puppies/:id` to update a
   Now we'll add a route in [puppiest.ts](./server/routes/puppies.ts):
 
   ```ts
-  router.patch('/:id', async (req, res, next) => {
+  router.patch('/:id', async (req, res) => {
     try {
       const id = Number(req.params.id)
       await store.updatePuppy(id, req.body)
       res.sendStatus(204)
-    } catch (error) {
-      next(error)
+    } catch (error: any) {
+     throw error
     }
   })
   ```
