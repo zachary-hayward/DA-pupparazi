@@ -59,7 +59,7 @@ export default router
 Then we'll add our root ('/') puppy route handler. For now, we'll just send an empty array:
 
 ```js
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
   res.json([])
 })
 ```
@@ -99,7 +99,7 @@ Now back in your puppy route handler, have it send this data instead of the empt
 ```ts
 import * as store from '../store.ts'
 
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
   const data = await store.getPuppies()
   res.json(data)
 })
@@ -198,7 +198,7 @@ You can either loop through the puppies or use [`array.find`](https://developer.
 Next, add a new route handler in [`puppies.ts`](./server/routes/puppies.ts) which uses a route param:
 
 ```js
-router.get('/:id', async (res, req, next) => {
+router.get('/:id', async (res, req) => {
   const id = Number(req.params.id)
   console.log(id)
 })
