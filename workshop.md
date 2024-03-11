@@ -178,7 +178,7 @@ For example: `GET /api/v1/puppies/1` will get a document that looks like this:
 }
 ```
 
-If you run `npm test`, you'll the tests for "Reading a specific puppy" are red. That's great! Now let's make them green again.
+If you run `npm test`, you'll see the tests for "Reading a specific puppy" are red. That's great! Now let's make them green again.
 
 Write a function that gets an array of _all the puppies_ and then returns one with a matching ID if it
 exists or undefined otherwise. You can probably re-use the function you wrote to get all the puppies previously
