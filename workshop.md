@@ -159,12 +159,12 @@ And if you visit the browser now, you should be able to see our beautiful pups :
 
 - [ ] As a user, I want to click on a puppy and see their name, breed, and who their owner is.
 
-For this step we will implement a route `GET /api/v1/puppies/:id` to fetch details of a specific puppy. We will update frontend to allow users to click on a puppy and see their details.
+For this step we will implement a route `GET /api/v1/puppies/:id` to fetch details of a specific puppy. We will update the frontend to allow users to click on a puppy and see their details.
 
   <details style="padding-left: 2em">
     <summary>More about puppy pages</summary>
 
-The frontend is set up for this, we just need to set up the API route that get's the data of a specific puppy using it's unique identifier (id). So our API route needs to include the `/:id` parameter (more on this soon!).
+The frontend is set up for this, we just need to set up the API route that gets the data of a specific puppy using its unique identifier (id). So our API route needs to include the `/:id` parameter (more on this soon!).
 
 For example: `GET /api/v1/puppies/1` will get a document that looks like this:
 
@@ -178,7 +178,7 @@ For example: `GET /api/v1/puppies/1` will get a document that looks like this:
 }
 ```
 
-If you run `npm test`, you'll see the tests for "Reading a specific puppy" are red. That's great! Now let's make them green again.
+If you run `npm test`, you'll see the tests for "Reading a specific puppy" are red. That's great! Now let's make them green.
 
 Write a function that gets an array of _all the puppies_ and then returns one with a matching ID if it
 exists or undefined otherwise. You can probably re-use the function you wrote to get all the puppies previously
@@ -238,9 +238,9 @@ For this step you will implement a route `PATCH /api/v1/puppies/:id` to update a
 
 Visit `http://localhost:5173/2/edit` to see the edit form. This is already hooked up to our API to load the values.
 
-We should already have a red test under 'editing puppies', let's make it green.
+We should already have a red test under 'editing puppies', so now let's make it green.
 
-Now to save the values we need a new route at `PATCH /api/v1/puppies/:id`
+To save the updated puppy values, we need a new route at `PATCH /api/v1/puppies/:id`
 
 First, we'll take care of the data-handling side of it.
 
@@ -259,7 +259,7 @@ In this function:
 1. update or replace that puppy in the array
 1. Write the entire data object to a file in the `storage` folder (with `fs.writeFile`). We will call this file data.json. You don't have to explicitly create this file, the `writeFile` function will do it for you as long as the path is correct.
 
-Now we'll add a route in [puppiest.ts](./server/routes/puppies.ts):
+Now we'll add a route in [puppies.ts](./server/routes/puppies.ts):
 
 ```ts
 router.patch('/:id', async (req, res) => {
