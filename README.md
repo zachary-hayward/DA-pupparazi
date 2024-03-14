@@ -4,9 +4,9 @@ Learning objectives:
 
 1. Learn Express router
 1. Practise using promises
-1. Practise testing and TDD (test driven development)
+1. Practise file-system methods
 
-Our app is incomplete. We use a combination of TDD and user stories to get it to work in the way we want it to. When complete, your application might look like this:
+Our app is incomplete. We use a combination of tests and user stories to get it to work in the way we want it to. When complete, your application might look like this:
 
 ![Screenshot of a very simple page with the stylized title "Pupparazzi" and a link reading "Home" above a circular image of a puppy. All on a pink background](screenshot.png)
 
@@ -92,28 +92,48 @@ Let's get familiar with the code base so you can begin to understand what needs 
   Now that we have our basic setup, let's load some actual puppies.
   </details>
 
-- [ ] Use the 'default' puppies from `server/initial-data.ts`
+- [ ] Read our data from a JSON file
   <details>
-    <summary>More about our 'default' puppies</summary>
+    <summary>How to get data from the file system</summary>
 
-  Since `initial-data.ts` is part of our source code, we can `import` it. Notice the `export default` for the puppies data which allows us to import it.
+  First we're going to need a file to read from, there's an example file in the repo called [example.json](./example.json) and before we get started let's copy it into the storage folder.
 
-  In `store.ts` we have defined a function called `getPuppies`, that (for now) just returns your initial-data wrapped in a promise.
+  We're going to call the copy "data.json". You can do this in VS Code or by running the following command.
 
-  Now back in your puppy route handler, have it send this data instead of the empty array. You should now be able to see some puppies in the frontend.
+  ```sh
+  cp example.json ./storage/data.json
+  ```
+
+  There's an existing test for this feature. Run `npm test -- -t 'Listing all puppies'` and you should see a test failing
+
+  Now we can update our [puppy routes](./server/routes/puppies.ts) to serve data from that file
 
   ```ts
-  import * as store from '../store.ts'
+  import * as FS from 'node:fs/promises'
 
-  router.get('/', async (req, res, next) => {
-    const data = await store.getPuppies()
+  router.get('/', async (req, res) => {
+    const json = await readFile('./storage/data.json', 'utf8')
+    const data = JSON.parse(json)
     res.json(data)
   })
   ```
 
-  Check for updates in your tests. One of our backend tests should be passing now. Take a look at the tests and try to understand why that one is passing and the others aren't.
+  Since both the `readFile()` and the `JSON.parse()` can fail in unpredictable ways, we'll wrap them both _and the `res.json()` call_ into a `try`/`catch` block.
 
-And if you visit the browser now, you should be able to see our beautiful pups :)
+  ```ts
+  try {
+    // the happy path goes here
+  } catch (error: any) {
+    // Something bad has happened!
+    console.log('getting puppies failed', error)
+    res.sendStatus(500)
+  }
+  ```
+
+  Run the test `npm test -- -t 'Listing all puppies'` and you should see a test passing ✅
+
+  And if you visit the browser now, you should be able to see our beautiful pups 😊
+
   </details>
 
 ### 2. Displaying the detailed puppy page
@@ -152,7 +172,7 @@ For this step, let's use a 'user story' to figure out what functionailty to buil
   If you run `npm test`, you'll see that our new tests are failing. That's great! Now let's make them green again.
 
   Write a function that gets an array of _all the puppies_ and then returns one with a matching ID if it
-  exists or undefined otherwise. You can probably re-use the function you wrote to get all the puppies previously
+  exists or undefined otherwise. You can probably re-use the code we used to get all the puppies previously
 
   You can start with something like this:
 
@@ -192,102 +212,15 @@ For this step, let's use a 'user story' to figure out what functionailty to buil
 Let's use another user story:
 
 - [ ] As a user, I want to be able to update the puppy's name, breed, and owner
-  <details style="padding-left: 2em">
-    <summary>More about pupdates</summary>
+    <details style="padding-left: 2em">
+      <summary>More about pupdates</summary>
 
   Visit `http://localhost:5173/2/edit` to see the edit form. This is already hooked up to
   our API to load the values. Now to save the values we need a new route at `PATCH /api/v1/puppies/:id`
 
-  Open [puppies.tests.ts](./server/routes/puppies.test.ts) and let's write a new test for this route.
+  However if you submit the form, you likely get an error.
 
-  For this test we'll mock out both the readFile and writeFile
-
-  ```js
-  vi.mocked(fs.readFile).mockImplementation(async () => {
-    const puppies = [
-      {
-        id: 1,
-        name: 'Fido',
-        owner: 'Fred',
-        image: '/images/puppy1.jpg',
-        breed: 'Labrador',
-      },
-      {
-        id: 2,
-        name: 'Coco',
-        owner: 'Chloe',
-        image: '/images/puppy2.jpg',
-        breed: 'Labrador',
-      },
-    ]
-    // simulate a data file with only two puppies... a sad state
-    return JSON.stringify({ puppies }, null, 2)
-  })
-
-  vi.mocked(fs.writeFile).mockImplementation(async () => {})
-  ```
-
-  This time we'll simulate a `PATCH` request:
-
-  ```js
-  const res = await request(server).patch('/api/v1/puppies/2').send({
-    name: 'Sam',
-    breed: 'Pug',
-    owner: 'Fred',
-    image: '/images/puppy3.jpg',
-  })
-  ```
-
-  It's important to make an assertion about the `res.statusCode` (in this case we'll expect `204`), but
-  the main thing we're looking for is "did the data file get updated", so we'll make an assertion
-  that `fs.writeFile` was called.
-
-  ```js
-  expect(fs.writeFile).toHaveBeenCalled()
-  ```
-
-  Usually we could write a `.toHaveBeenCalledWith(...)` to make very specific assertions about
-  the arguments to the function, but in this case we're dealing with JSON so it's harder to be that specific.
-
-  For example, the keys in a JSON object can be in any order and there are many ways to represent a given string.
-  If we can't be sure of the order we can use `toEqual`
-
-  Luckily vitest mocks remember each time they were called, so what we can do is:
-
-  1. get the lastCall to `fs.writeFile`
-  1. take the 2nd argument from it
-  1. parse it with `JSON.parse`
-  1. compare the result with what we expect
-
-  that might look like this:
-
-  ```js
-  const lastCall = vi.mocked(fs.writeFile).mock.lastCall
-  const json = lastCall?.[1] as string
-  const data = JSON.parse(json)
-
-  // this is what should be written back to the data file
-  expect(data).toEqual({
-    puppies: [
-      {
-        id: 1,
-        name: 'Fido',
-        owner: 'Fred',
-        image: '/images/puppy1.jpg',
-        breed: 'Labrador',
-      },
-      {
-        id: 2,
-        name: 'Sam',
-        breed: 'Pug',
-        owner: 'Fred',
-        image: '/images/puppy3.jpg',
-      },
-    ],
-  })
-  ```
-
-  We should now have a red test, let's make it green.
+  Run this test to confirm `npm test -- -t 'editing puppies' and you should see a failure.
 
   First, we'll take care of the data-handling side of it.
 
@@ -304,7 +237,7 @@ Let's use another user story:
   1. call `getPuppies()` to get the list of puppies
   1. locate a puppy with the matching ID
   1. update or replace that puppy in the array
-  1. Write the entire array in a new blank file in the storage folder (with `fs.writeFile`). We will call this file data.json. You don't actually have to create this file, the writeFile function will do it for you as long as the path is correct.
+  1. Write the entire array back to `./storage/data.json`, remember that the correct encoding for a JSON file is `'utf8'`
 
   Now we'll add a route in [puppiest.ts](./server/routes/puppies.ts):
 
@@ -319,38 +252,13 @@ Let's use another user story:
     }
   })
   ```
-Your tests still won't pass yet (That will happen after we bring in readFile in the next step). But you should be able to update a puppy in the browser and see the new data.json file created with the new pups. You will also see the updated puppies on the homepage. However, if you restart the server and checkout the homepage, you will see that the old pups are back. This is because, we are still displaying the puppies from initialData.
 
-- [ ] Read the updated puppies from `storage/data.json`
+  Now run your test again `npm test -- -t 'editing puppies'` and you should see it passing ✅
 
-  <details>
-    <summary>Reading puppies from our data file</summary>
+  You should be able to update a puppy in the browser and see the `data.json` file updated with the new information. You will also see the updated puppies on the homepage.
 
-  Since `initial-data.ts` is part of our source code, it won't change while the app is running. Instead we need to
-  read them from the `storage/data.json` file.
+  Commit, push and you could now submit your branch for the CP07 Trello ticket 😊
 
-  We'll do this by updating. the `getPuppies` function to read the JSON file
-
-  Use `readFile` from `node:fs/promises` to read the JSON file, and `JSON.parse(...)` to translate the string into a JavaScript object.
-
-  If the file doesn't exist, `readFile` will throw a special error with the code `ENOENT`. We can check for this specific error and return our initial data as a fallback. For any other error we will re-`throw` it
-
-  ```js
-  try {
-    const json = await fs.readFile(...)
-    ...
-  } catch (error: any) {
-    if (error.code === 'ENOENT') {
-      return initialData
-    }
-
-    throw error
-  }
-  ```
-
-  When you've finished this, our route tests should pass. Load up the edit form: http://localhost:5173/1/edit and check that everything works as expected.
-
-Commit, push and you could now submit your branch for the CP07 Trello ticket :) 
   </details>
 
 ## Stretch
@@ -370,9 +278,10 @@ If you've reached this point, congratulations! As a stretch, you might like to d
 <details>
   <summary>How to submit this challenge</summary>
 
-This challenge can be used for the following assessments: 
+This challenge can be used for the following assessments:
+
 - WD01: Build an HTTP server with a restful JSON API
-  
+
 This challenge ships with some end-to-end tests written in playwright, if you are submitting this
 challenge to complete an NZQA requirement, please make sure these tests are passing _before_ you submit.
 
