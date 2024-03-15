@@ -107,13 +107,11 @@ describe('editing puppies', () => {
       return fileContents
     })
 
-    vi.mocked(fs.writeFile).mockImplementation(
-      async (filePath, data, encoding) => {
-        if (typeof data === 'string') {
-          fileContents = data
-        }
-      },
-    )
+    vi.mocked(fs.writeFile).mockImplementation(async (filePath, data) => {
+      if (typeof data === 'string') {
+        fileContents = data
+      }
+    })
 
     await request(server).patch('/api/v1/puppies/2').send({
       id: 2,

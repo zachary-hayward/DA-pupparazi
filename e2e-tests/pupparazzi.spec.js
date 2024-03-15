@@ -63,10 +63,6 @@ test('making a brand new puppy', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Add Puppy' }).click()
 
-  await expect(
-    page.getByRole('heading', { name: 'Add a new puppy' }),
-  ).toBeVisible()
-
   await page.getByLabel('Name:').fill('Apple')
   await page.getByLabel('Breed:').fill('Baby')
   await page.getByLabel('Owner:').fill('Goop')

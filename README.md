@@ -67,7 +67,7 @@ Let's get familiar with the code base so you can begin to understand what needs 
   Then we'll add our root ('/') puppy route handler. For now, we'll just send an empty array:
 
   ```js
-  router.get('/', async (req, res, next) => {
+  router.get('/', async (req, res) => {
     res.json([])
   })
   ```
@@ -109,7 +109,7 @@ Let's get familiar with the code base so you can begin to understand what needs 
   Now we can update our [puppy routes](./server/routes/puppies.ts) to serve data from that file
 
   ```ts
-  import * as FS from 'node:fs/promises'
+  import { readFile } from 'node:fs/promises'
 
   router.get('/', async (req, res) => {
     const json = await readFile('./storage/data.json', 'utf8')
@@ -158,53 +158,45 @@ For this step, let's use a 'user story' to figure out what functionailty to buil
   }
   ```
 
-  Start by opening [puppies.tests.ts](./server/routes/puppies.test.ts), we can use the tests that are already there
-  as a template.
+You can run the tests for this functionality with: `npm test -- -t 'Reading a specific puppy'`
 
-  These new tests will do a different request:
+You should see that test is failing ❌, next we'll write the code to make this test pass
 
-  ```js
-  const res = await request(server).get('/api/v1/puppies/1')
-  ```
+Write a function that gets an array of _all the puppies_ and then returns one with a matching ID if it
+exists or undefined otherwise. You can probably re-use the code we used to get all the puppies previously
 
-  and update the assertions in our new test to match what we expect, that they will return a JSON document representing a single puppy.
+You can start with something like this:
 
-  If you run `npm test`, you'll see that our new tests are failing. That's great! Now let's make them green again.
+```ts
+import type { Puppy } from '../models/Puppy.ts'
 
-  Write a function that gets an array of _all the puppies_ and then returns one with a matching ID if it
-  exists or undefined otherwise. You can probably re-use the code we used to get all the puppies previously
+async function getPuppyById(id: number): Promise<Puppy | undefined> {
+ ...
+}
+```
 
-  You can start with something like this:
+You can either loop through the puppies or use [`array.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
 
-  ```ts
-  import type { Puppy } from '../models/Puppy.ts'
+Next, add a new route handler in [`puppies.ts`](./server/routes/puppies.ts) which uses a route param:
 
-  async function getPuppyById(id: number): Promise<Puppy | undefined> {
-   ...
-  }
-  ```
+```js
+router.get('/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  console.log(id)
+})
+```
 
-  You can either loop through the puppies or use [`array.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+Using the `:` in route pattern like that means that `:id` is a path parameter, e.g. it will match `/api/v1/puppies/1` and req.params will look like this: `{ id: '1' }`
 
-  Next, add a new route handler in [`puppies.ts`](./server/routes/puppies.ts) which uses a route param:
+Use that `id` variable to call `getPuppyById`. If it resolves with a Puppy you can call `res.json(puppy)` but
+if the it doesn't find one (i.e. `puppy` is `undefined`), the we should `res.sendStatus(404)` the HTTP Status code for [Not Found](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404).
 
-  ```js
-  router.get('/:id', async (res, req, next) => {
-    const id = Number(req.params.id)
-    console.log(id)
-  })
-  ```
+Run these tests again `npm test -- -t 'Reading a specific puppy'` and if all went well, they should be passing ✅
 
-  Using the `:` in route pattern like that means that `:id` is a path parameter, e.g. it will match `/api/v1/puppies/1` and req.params will look like this: `{ id: '1' }`
+Hit `http://localhost:5173/api/v1/puppies/1` in Thunderclient, Insomnia or Bruno (or your other favourite Rest API Client) and confirm that it's showing what you expect.
 
-  Use that `id` variable to call `getPuppyById`. If it resolves with a Puppy you can call `res.json(puppy)` but
-  if the it doesn't find one (i.e. `puppy` is `undefined`), the we should `res.sendStatus(404)` the HTTP Status code for [Not Found](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404).
+Visit the page at `http://localhost:5173/1` to confirm that the individual puppy view is working.
 
-  If everything went well, then the tests you wrote should be passing now.
-
-  Hit `http://localhost:5173/api/v1/puppies/1` in Thunderclient, Insomnia or Bruno (or your other favourite Rest API Client) and confirm that it's showing what you expect.
-
-  Visit the page at `http://localhost:5173/1` to confirm that the individual puppy view is working.
   </details>
 
 ### 3. Updating a puppy
@@ -220,14 +212,14 @@ Let's use another user story:
 
   However if you submit the form, you likely get an error.
 
-  Run this test to confirm `npm test -- -t 'editing puppies' and you should see a failure.
+  Run this test to confirm `npm test -- -t 'editing puppies'` and you should see a failure.
 
   First, we'll take care of the data-handling side of it.
 
   ```ts
-  import type { PuppyData } from '../models/Puppy.ts'
+  import type { Puppy } from '../models/Puppy.ts'
 
-  async function updatePuppy(id: number, data: PuppyData): Promise<void> {
+  async function updatePuppy(id: number, data: Puppy): Promise<void> {
     ...
   }
   ```
@@ -235,20 +227,20 @@ Let's use another user story:
   In this function:
 
   1. call `getPuppies()` to get the list of puppies
-  1. locate a puppy with the matching ID
-  1. update or replace that puppy in the array
-  1. Write the entire array back to `./storage/data.json`, remember that the correct encoding for a JSON file is `'utf8'`
+  1. replace the matching puppy with our new data (hint: look at each of their ids)
+  1. Write the entire array back to `./storage/data.json` with `writeFile`, remember that the correct encoding for a JSON file is `'utf8'`
 
   Now we'll add a route in [puppiest.ts](./server/routes/puppies.ts):
 
   ```ts
-  router.patch('/:id', async (req, res, next) => {
+  router.patch('/:id', async (req, res) => {
     try {
       const id = Number(req.params.id)
-      await store.updatePuppy(id, req.body)
+      await updatePuppy(id, req.body)
       res.sendStatus(204)
     } catch (error) {
-      next(error)
+      console.log('Failed to update puppy', error)
+      res.sendStatus(500)
     }
   })
   ```
