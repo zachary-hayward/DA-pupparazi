@@ -1,7 +1,8 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
-import { Puppy } from '../../models/Puppy'
 import { useNavigate } from 'react-router-dom'
-import { useUpdatePuppy } from '../hooks/api'
+
+import { Puppy } from '../../models/Puppy.ts'
+import { useUpdatePuppy } from '../hooks/api.ts'
 
 interface Props extends Puppy {}
 
