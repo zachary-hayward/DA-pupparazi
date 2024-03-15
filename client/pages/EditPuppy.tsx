@@ -1,30 +1,21 @@
-import { useCallback } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-
-import { usePuppy, useUpdatePuppy } from '../hooks/api.ts'
+import { useParams } from 'react-router-dom'
+import { usePuppy } from '../hooks/api.ts'
 import ErrorMessage from '../components/ErrorMessage.tsx'
 import LoadingIndicator from '../components/LoadingIndicator.tsx'
 import EditPuppyForm from '../components/EditPuppyForm.tsx'
-import { PuppyData } from '../../models/Puppy.ts'
 
 export default function EditPuppy() {
-  const id = Number(useParams().id)
-  if (isNaN(id)) {
+  const id = useParams()
+  if (id == undefined) {
     throw new Error(`Missing route param "id"`)
   }
 
-  const puppy = usePuppy(id)
-  const edit = useUpdatePuppy(id)
+  const idAsNumber = Number(id)
+  if (isNaN(idAsNumber)) {
+    throw new Error(`Route param "id" is invalid`)
+  }
 
-  const navigate = useNavigate()
-
-  const handleUpdate = useCallback(
-    async (puppy: Partial<PuppyData>) => {
-      await edit.mutateAsync({ puppy })
-      navigate(`/${id}`)
-    },
-    [edit, navigate, id]
-  )
+  const puppy = usePuppy(idAsNumber)
 
   if (puppy.isPending) {
     return <LoadingIndicator />
@@ -34,11 +25,5 @@ export default function EditPuppy() {
     return <ErrorMessage error={puppy.error} />
   }
 
-  return (
-    <EditPuppyForm
-      onUpdate={handleUpdate}
-      pending={edit.isPending}
-      {...puppy.data}
-    />
-  )
+  return <EditPuppyForm {...puppy.data} />
 }

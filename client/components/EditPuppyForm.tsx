@@ -1,47 +1,71 @@
-import { ChangeEvent, FormEvent, useCallback, useState } from 'react'
-import { PuppyData } from '../../models/Puppy'
+import { ChangeEvent, FormEvent, useState } from 'react'
+import { Puppy } from '../../models/Puppy'
+import { useNavigate } from 'react-router-dom'
+import { useUpdatePuppy } from '../hooks/api'
 
-interface Props extends PuppyData {
-  pending: boolean
-  onUpdate: (data: PuppyData) => void
-}
+interface Props extends Puppy {}
 
 export default function EditPuppyForm(props: Props) {
-  const { onUpdate, pending, ...puppy } = props
-  const [{ name, breed, owner, image }, setFormState] = useState(puppy)
-  const handleSubmit = (evt: FormEvent<HTMLFormElement>) => {
+  const { ...puppy } = props
+
+  const edit = useUpdatePuppy(puppy.id)
+  const navigate = useNavigate()
+  const [formState, setFormState] = useState(puppy)
+
+  async function handleSubmit(evt: FormEvent<HTMLFormElement>) {
     evt.preventDefault()
-    if (pending) {
+    if (edit.isPending) {
       return
     }
-    onUpdate({ name, breed, owner, image })
+    await edit.mutateAsync({ puppy })
+    navigate(`/${puppy.id}`)
   }
 
-  const handleChange = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
+  function handleChange(evt: ChangeEvent<HTMLInputElement>) {
     const { name, value } = evt.currentTarget
     setFormState((prev) => ({ ...prev, [name]: value }))
-  }, [])
+  }
 
   return (
     <form onSubmit={handleSubmit} className="form">
       <img className="img-circle" src={puppy.image} alt={puppy.name} />
       <div className="form-item">
         <label htmlFor="name">Name:</label>
-        <input name="name" id="name" value={name} onChange={handleChange} />
+        <input
+          name="name"
+          id="name"
+          value={formState.name}
+          onChange={handleChange}
+        />
       </div>
       <div className="form-item">
         <label htmlFor="breed">Breed:</label>
-        <input name="breed" id="breed" value={breed} onChange={handleChange} />
+        <input
+          name="breed"
+          id="breed"
+          value={formState.breed}
+          onChange={handleChange}
+        />
       </div>
       <div className="form-item">
         <label htmlFor="owner">Owner:</label>
-        <input name="owner" id="owner" value={owner} onChange={handleChange} />
+        <input
+          name="owner"
+          id="owner"
+          value={formState.owner}
+          onChange={handleChange}
+        />
       </div>
       <div className="form-item">
         <label htmlFor="image">Image:</label>
-        <input name="image" id="image" value={image} onChange={handleChange} />
+        <input
+          name="image"
+          id="image"
+          value={formState.image}
+          onChange={handleChange}
+        />
       </div>
-      <button data-pending={pending}>Submit</button>
+      <button data-pending={edit.isPending}>Submit</button>
     </form>
   )
 }

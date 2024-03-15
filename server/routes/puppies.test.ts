@@ -40,29 +40,31 @@ describe('Listing all puppies', () => {
 
     const res = await request(server).get('/api/v1/puppies')
     expect(res.statusCode).toBe(200)
-    expect(res.body).toStrictEqual([
-      {
-        breed: 'Pug',
-        id: 1,
-        image: '/images/dog1.jpg',
-        name: 'Coco',
-        owner: 'James',
-      },
-      {
-        breed: 'Dog',
-        id: 2,
-        image: '/images/dog2.jpg',
-        name: 'Fido',
-        owner: 'Jimmy',
-      },
-      {
-        breed: 'Frog',
-        id: 3,
-        image: '/images/dog3.jpg',
-        name: 'Kermit',
-        owner: 'Jerm',
-      },
-    ])
+    expect(res.body).toStrictEqual({
+      puppies: [
+        {
+          breed: 'Pug',
+          id: 1,
+          image: '/images/dog1.jpg',
+          name: 'Coco',
+          owner: 'James',
+        },
+        {
+          breed: 'Dog',
+          id: 2,
+          image: '/images/dog2.jpg',
+          name: 'Fido',
+          owner: 'Jimmy',
+        },
+        {
+          breed: 'Frog',
+          id: 3,
+          image: '/images/dog3.jpg',
+          name: 'Kermit',
+          owner: 'Jerm',
+        },
+      ],
+    })
   })
 })
 
@@ -80,24 +82,26 @@ describe('Reading a specific puppy', () => {
 
 describe('editing puppies', () => {
   it('updates the correct puppy', async () => {
-    const puppies = [
-      {
-        id: 1,
-        name: 'Fido',
-        owner: 'Fred',
-        image: '/images/puppy1.jpg',
-        breed: 'Labrador',
-      },
-      {
-        id: 2,
-        name: 'Coco',
-        owner: 'Chloe',
-        image: '/images/puppy2.jpg',
-        breed: 'Labrador',
-      },
-    ]
+    const data = {
+      puppies: [
+        {
+          id: 1,
+          name: 'Fido',
+          owner: 'Fred',
+          image: '/images/puppy1.jpg',
+          breed: 'Labrador',
+        },
+        {
+          id: 2,
+          name: 'Coco',
+          owner: 'Chloe',
+          image: '/images/puppy2.jpg',
+          breed: 'Labrador',
+        },
+      ],
+    }
     // simulate a data file with only two puppies... a sad state
-    let fileContents = JSON.stringify({ puppies }, null, 2)
+    let fileContents = JSON.stringify(data, null, 2)
 
     vi.mocked(fs.readFile).mockImplementation(async () => {
       return fileContents
@@ -112,6 +116,7 @@ describe('editing puppies', () => {
     )
 
     await request(server).patch('/api/v1/puppies/2').send({
+      id: 2,
       name: 'Sam',
       breed: 'Pug',
       owner: 'Fred',
@@ -120,9 +125,9 @@ describe('editing puppies', () => {
 
     const res = await request(server).get('/api/v1/puppies')
     expect(res.statusCode).toBe(200)
-    const data = res.body
+
     // this is what should be written back to the data file
-    expect(data).toEqual({
+    expect(res.body).toEqual({
       puppies: [
         {
           id: 1,
