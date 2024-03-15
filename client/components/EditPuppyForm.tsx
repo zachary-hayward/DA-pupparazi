@@ -1,8 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from 'react'
+import { Puppy } from '../../models/Puppy'
 import { useNavigate } from 'react-router-dom'
-
-import { Puppy } from '../../models/Puppy.ts'
-import { useUpdatePuppy } from '../hooks/api.ts'
+import { useUpdatePuppy } from '../hooks/api'
 
 interface Props extends Puppy {}
 
@@ -11,6 +10,7 @@ export default function EditPuppyForm(props: Props) {
 
   const edit = useUpdatePuppy(puppy.id)
   const navigate = useNavigate()
+
   const [formState, setFormState] = useState(puppy)
 
   async function handleSubmit(evt: FormEvent<HTMLFormElement>) {
@@ -18,7 +18,7 @@ export default function EditPuppyForm(props: Props) {
     if (edit.isPending) {
       return
     }
-    await edit.mutateAsync({ puppy })
+    await edit.mutateAsync({ puppy: formState })
     navigate(`/${puppy.id}`)
   }
 

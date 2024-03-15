@@ -7,7 +7,7 @@ let initialData = ''
 
 test.beforeAll(async () => {
   // remember how our data looked when we started
-  initialData = await fs.readFile('./server/data/data.json', 'utf8')
+  initialData = await fs.readFile('./storage/data.json', 'utf8')
 })
 
 test.beforeEach(async () => {
@@ -18,7 +18,7 @@ test.beforeEach(async () => {
 
 test.afterAll(async () => {
   // when we're done we can put it back to normal
-  await fs.writeFile('./server/data/data.json', initialData, 'utf8')
+  await fs.writeFile('./storage/data.json', initialData, 'utf8')
 })
 
 test('has title', async ({ page }) => {
@@ -64,7 +64,7 @@ test('making a brand new puppy', async ({ page }) => {
   await page.getByRole('link', { name: 'Add Puppy' }).click()
 
   await expect(
-    page.getByRole('heading', { name: 'Add a new puppy' })
+    page.getByRole('heading', { name: 'Add a new puppy' }),
   ).toBeVisible()
 
   await page.getByLabel('Name:').fill('Apple')
@@ -78,6 +78,6 @@ test('making a brand new puppy', async ({ page }) => {
 
 async function resetData() {
   if (existsSync('storage/data.json')) {
-    await fs.unlink('storage/data.json')
+    await fs.cp('example.json', 'storage/data.json')
   }
 }

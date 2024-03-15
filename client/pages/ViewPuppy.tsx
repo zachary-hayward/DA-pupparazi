@@ -8,7 +8,7 @@ export default function ViewPuppy() {
   const params = useParams()
   const id = Number(params.id)
   if (isNaN(id)) {
-    throw new Error(`Missing route param "id"`)
+    throw new Error(`Route param "id" is missing or invalid`)
   }
 
   const puppy = usePuppy(id)

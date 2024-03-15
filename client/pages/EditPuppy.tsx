@@ -5,17 +5,13 @@ import LoadingIndicator from '../components/LoadingIndicator.tsx'
 import EditPuppyForm from '../components/EditPuppyForm.tsx'
 
 export default function EditPuppy() {
-  const id = useParams()
-  if (id == undefined) {
-    throw new Error(`Missing route param "id"`)
+  const params = useParams()
+  const id = Number(params.id)
+  if (isNaN(id)) {
+    throw new Error(`Route param "id" is missing or invalid`)
   }
 
-  const idAsNumber = Number(id)
-  if (isNaN(idAsNumber)) {
-    throw new Error(`Route param "id" is invalid`)
-  }
-
-  const puppy = usePuppy(idAsNumber)
+  const puppy = usePuppy(id)
 
   if (puppy.isPending) {
     return <LoadingIndicator />
