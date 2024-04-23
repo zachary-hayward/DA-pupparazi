@@ -16,16 +16,18 @@ export default function PuppiesList() {
   }
 
   return (
-    <div className="container">
-      {puppies.data.map((pup) => (
-        <div key={pup.id} className="puppy-list">
-          <Link to={`/${pup.id}`}>
-            <img className="img-circle" src={pup.image} alt={pup.name} />
-            <span>{pup.name}</span>
-          </Link>
-        </div>
-      ))}
-      <Link to="/new">Add Puppy</Link>
-    </div>
+    <>
+      <h3><Link to="/new">Add Puppy</Link></h3>
+      <div className="container">
+        {puppies.data.map((pup) => (
+          <div key={pup.id} className="puppy-list">
+            <Link to={`/${pup.id}`}>
+              <img className="img-circle" src={pup.image} alt={pup.name} />
+              <h3>{pup.name}</h3>
+            </Link>
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
