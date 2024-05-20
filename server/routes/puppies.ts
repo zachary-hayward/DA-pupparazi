@@ -1,5 +1,5 @@
 import express from "express"
-import { getPuppies } from "../initial-data"
+import { getPuppies } from "../store.ts"
 
 const router = express.Router()
 
