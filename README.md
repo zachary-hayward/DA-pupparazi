@@ -9,7 +9,7 @@
 
 ### 0. Cloning and installation
 
-- [ ] Clone this repo, navigate to it, install dependencies with `npm install`, and start the dev server with `npm run dev`
+- [x] Clone this repo, navigate to it, install dependencies with `npm install`, and start the dev server with `npm run dev`
 
 ---
 
@@ -30,7 +30,7 @@
 
 ## 1. Take a look around and list all puppies
 
-- [ ] As a user, I want to see a list off all the puppies.
+- [x] As a user, I want to see a list off all the puppies.
 
 Let's get familiar with the code base so you can begin to understand what needs to be done to get it to work.
 
