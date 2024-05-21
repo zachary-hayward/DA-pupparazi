@@ -28,8 +28,10 @@ export async function updatePuppy(id: number, newData: Puppy) {
   try {
     const data = await getPuppies()
     const dataIndex = data.puppies.findIndex(pup => pup.id === id)
-    data.puppies[dataIndex] = newData
-    await fs.writeFile(Path.resolve(dataPath), JSON.stringify(data), 'utf-8')
+    if (dataIndex !== -1) {
+      data.puppies[dataIndex] = {...newData, id}
+      await fs.writeFile(Path.resolve(dataPath), JSON.stringify(data), 'utf-8')
+    }
   } catch (error) {
     throw new Error
   }
