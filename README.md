@@ -111,7 +111,7 @@ And if you visit the browser now, you should be able to see our beautiful pups :
 
   </details>
 
-- [ ] Read the updated puppies from `storage/data.json`
+- [x] Read the updated puppies from `storage/data.json`
 
   <details>
     <summary>Reading puppies from our data file</summary>
@@ -157,7 +157,7 @@ And if you visit the browser now, you should be able to see our beautiful pups :
 
 ## 2. Displaying a detailed single puppy page
 
-- [ ] As a user, I want to click on a puppy and see their name, breed, and who their owner is.
+- [x] As a user, I want to click on a puppy and see their name, breed, and who their owner is.
 
 For this step we will implement a route `GET /api/v1/puppies/:id` to fetch details of a specific puppy. We will update the frontend to allow users to click on a puppy and see their details.
 
@@ -229,7 +229,7 @@ Visit the page at `http://localhost:5173/1` to confirm that the individual puppy
 
 ## 3. Updating a puppy
 
-- [ ] As a user, I want to be able to update the puppy's name, breed, and owner
+- [x] As a user, I want to be able to update the puppy's name, breed, and owner
 
 For this step you will implement a route `PATCH /api/v1/puppies/:id` to update a puppy's details. You will update frontend to allow users to edit and update a puppy's details.
 
