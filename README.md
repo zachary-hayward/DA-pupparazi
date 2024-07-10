@@ -8,4 +8,5 @@
 - [ ] Displaying a detailed single puppy page
 - [ ] Updating a puppy
 - [ ] Adding a new puppy
+- [ ] Removing a puppy
 - [ ] Adding a new animal
